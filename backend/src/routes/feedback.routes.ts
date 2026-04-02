@@ -7,6 +7,8 @@ import {
     deleteFeedback,
     getAISummary
   } from "../controllers/feedback.controller";
+  import { feedbackLimiter } from "../middleware/rateLimiter";
+  import Feedback from "../models/feedback.model"; 
 
   const router = express.Router();
   
@@ -16,6 +18,20 @@ import {
   router.patch("/:id", updateStatus);
   router.delete("/:id", deleteFeedback);
   router.get("/summary", getAISummary);
+
+  router.post("/feedback", feedbackLimiter, async (req, res) => {
+    try {
+      const feedback = new Feedback(req.body);
+      await feedback.save();
+  
+      res.status(201).json({
+        message: "Feedback submitted successfully!",
+        data: feedback,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error saving feedback" });
+    }
+  });
 
 
 

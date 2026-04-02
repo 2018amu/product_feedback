@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// ✅ Interface (TypeScript type safety)
+// Interface for feedback 
 export interface IFeedback extends Document {
   title: string;
   description: string;
@@ -21,7 +21,7 @@ export interface IFeedback extends Document {
   updatedAt?: Date;
 }
 
-// ✅ Schema
+//  Schema
 const FeedbackSchema = new Schema<IFeedback>(
   {
     title: {
@@ -58,7 +58,7 @@ const FeedbackSchema = new Schema<IFeedback>(
       match: [/^\S+@\S+\.\S+$/, "Please use a valid email"],
     },
 
-    // ✅ AI fields
+    //  AI fields
     ai_category: {
       type: String,
     },
@@ -85,17 +85,17 @@ const FeedbackSchema = new Schema<IFeedback>(
     },
   },
   {
-    timestamps: true, // ✅ auto createdAt & updatedAt
+    timestamps: true, //  auto createdAt & updatedAt
   }
 );
 
-// ✅ Indexes (for performance)
+//  Indexes (for performance)
 FeedbackSchema.index({ status: 1 });
 FeedbackSchema.index({ category: 1 });
 FeedbackSchema.index({ ai_priority: -1 });
 FeedbackSchema.index({ createdAt: -1 });
 
-// ✅ Prevent model overwrite error (VERY IMPORTANT)
+//  Prevent model overwrite error (VERY IMPORTANT)
 const Feedback: Model<IFeedback> =
   mongoose.models.Feedback ||
   mongoose.model<IFeedback>("Feedback", FeedbackSchema);
