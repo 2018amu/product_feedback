@@ -10,6 +10,8 @@ export interface IFeedback extends Document {
   submitterName?: string;
   submitterEmail?: string;
 
+  ip?: string; //  ADD THIS
+
   ai_category?: string;
   ai_sentiment?: "Positive" | "Neutral" | "Negative";
   ai_priority?: number;
@@ -21,7 +23,7 @@ export interface IFeedback extends Document {
   updatedAt?: Date;
 }
 
-//  Schema
+// Schema
 const FeedbackSchema = new Schema<IFeedback>(
   {
     title: {
@@ -58,7 +60,13 @@ const FeedbackSchema = new Schema<IFeedback>(
       match: [/^\S+@\S+\.\S+$/, "Please use a valid email"],
     },
 
-    //  AI fields
+    //  IP FIELD (for rate limiting)
+    ip: {
+      type: String,
+      index: true, //  helps querying faster
+    },
+
+    // AI fields
     ai_category: {
       type: String,
     },
@@ -85,17 +93,20 @@ const FeedbackSchema = new Schema<IFeedback>(
     },
   },
   {
-    timestamps: true, //  auto createdAt & updatedAt
+    timestamps: true,
   }
 );
 
-//  Indexes (for performance)
+// Indexes (performance)
 FeedbackSchema.index({ status: 1 });
 FeedbackSchema.index({ category: 1 });
 FeedbackSchema.index({ ai_priority: -1 });
 FeedbackSchema.index({ createdAt: -1 });
 
-//  Prevent model overwrite error (VERY IMPORTANT)
+// Optional: compound index for rate limiting queries
+FeedbackSchema.index({ ip: 1, createdAt: -1 });
+
+// Prevent model overwrite error
 const Feedback: Model<IFeedback> =
   mongoose.models.Feedback ||
   mongoose.model<IFeedback>("Feedback", FeedbackSchema);

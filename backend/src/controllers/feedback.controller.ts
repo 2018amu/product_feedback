@@ -3,60 +3,80 @@ import Feedback from "../models/feedback.model";
 import { analyzeFeedback } from "../services/gemini.service";
 
 export const createFeedback = async (req: Request, res: Response) => {
-    try {
-      const { title, description, category, submitterName, submitterEmail } =
-        req.body;
-  
-      if (!title || !description || !category) {
-        return res.status(400).json({
-          success: false,
-          message: "Missing required fields",
-        });
-      }
-  
-      if (description.length < 20) {
-        return res.status(400).json({
-          success: false,
-          message: "Description must be at least 20 characters",
-        });
-      }
-  
-      // 1️⃣ Save feedback FIRST (important)
-      const feedback = await Feedback.create({
-        title,
-        description,
-        category,
-        submitterName,
-        submitterEmail,
-      });
-  
-      // 2️⃣ Call Gemini (async)
-      const aiResult = await analyzeFeedback(title, description);
-  
-      // 3️⃣ If AI success → update DB
-      if (aiResult) {
-        feedback.ai_category = aiResult.category;
-        feedback.ai_sentiment = aiResult.sentiment;
-        feedback.ai_priority = aiResult.priority_score;
-        feedback.ai_summary = aiResult.summary;
-        feedback.ai_tags = aiResult.tags;
-        feedback.ai_processed = true;
-  
-        await feedback.save();
-      }
-  
-      return res.status(201).json({
-        success: true,
-        data: feedback,
-        message: "Feedback submitted with AI analysis",
-      });
-    } catch (error) {
-      return res.status(500).json({
+  try {
+    const { title, description, category, submitterName, submitterEmail } =
+      req.body;
+
+    // ✅ Get client IP
+    const ip = req.ip;
+
+    // ✅ Rate limiting (5 per hour per IP)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+    const count = await Feedback.countDocuments({
+      ip,
+      createdAt: { $gte: oneHourAgo },
+    });
+
+    if (count >= 5) {
+      return res.status(429).json({
         success: false,
-        message: "Server error",
+        message: "Too many submissions. Please try again after 1 hour.",
       });
     }
-  };
+
+    // Validation
+    if (!title || !description || !category) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+
+    if (description.length < 20) {
+      return res.status(400).json({
+        success: false,
+        message: "Description must be at least 20 characters",
+      });
+    }
+
+    // 1️⃣ Save feedback FIRST (with IP)
+    const feedback = await Feedback.create({
+      title,
+      description,
+      category,
+      submitterName,
+      submitterEmail,
+      ip, // ✅ store IP
+    });
+
+    // 2️⃣ Call Gemini (async)
+    const aiResult = await analyzeFeedback(title, description);
+
+    // 3️⃣ If AI success → update DB
+    if (aiResult) {
+      feedback.ai_category = aiResult.category;
+      feedback.ai_sentiment = aiResult.sentiment;
+      feedback.ai_priority = aiResult.priority_score;
+      feedback.ai_summary = aiResult.summary;
+      feedback.ai_tags = aiResult.tags;
+      feedback.ai_processed = true;
+
+      await feedback.save();
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: feedback,
+      message: "Feedback submitted with AI analysis",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
 export const getAllFeedback = async (req: Request, res: Response) => {
     try {
       const data = await Feedback.find();
