@@ -92,7 +92,6 @@ export default function Home() {
             setForm({ ...form, title: e.target.value })
           }
         />
-
         <textarea
           placeholder="Describe your feedback..."
           className="w-full p-3 text-sm border rounded-lg h-28 resize-none bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition"

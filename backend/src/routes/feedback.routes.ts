@@ -5,12 +5,16 @@ import {
     getFeedbackById,
     updateStatus,
     deleteFeedback,
-    getAISummary
+    getAISummary,
+    getStats,
+    
   } from "../controllers/feedback.controller";
   import { feedbackLimiter } from "../middleware/rateLimiter";
   import Feedback from "../models/feedback.model"; 
 
+
   const router = express.Router();
+  router.get("/stats",getStats);
   
   router.post("/", createFeedback);
   router.get("/", getAllFeedback);
