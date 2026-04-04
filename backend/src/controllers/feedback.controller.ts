@@ -7,10 +7,10 @@ export const createFeedback = async (req: Request, res: Response) => {
     const { title, description, category, submitterName, submitterEmail } =
       req.body;
 
-    // ✅ Get client IP
+    //  Get client IP
     const ip = req.ip;
 
-    // ✅ Rate limiting (5 per hour per IP)
+    //  Rate limiting (5 per hour per IP)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     const count = await Feedback.countDocuments({
@@ -40,20 +40,20 @@ export const createFeedback = async (req: Request, res: Response) => {
       });
     }
 
-    // 1️⃣ Save feedback FIRST (with IP)
+    // 1️ Save feedback FIRST (with IP)
     const feedback = await Feedback.create({
       title,
       description,
       category,
       submitterName,
       submitterEmail,
-      ip, // ✅ store IP
+      ip, //  store IP
     });
 
-    // 2️⃣ Call Gemini (async)
+    // 2️ Call Gemini (async)
     const aiResult = await analyzeFeedback(title, description);
 
-    // 3️⃣ If AI success → update DB
+    // 3️ If AI success → update DB
     if (aiResult) {
       feedback.ai_category = aiResult.category;
       feedback.ai_sentiment = aiResult.sentiment;
