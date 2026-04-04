@@ -18,7 +18,7 @@ export default function Home() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
+    //validation 
     if (!form.title || form.description.length < 20) {
       setMessage("Please fill all fields correctly");
       return;
@@ -32,6 +32,7 @@ export default function Home() {
 
     if (res.success) {
       setMessage(" Feedback submitted successfully!");
+      //reset after submitting.
       setForm({
         title: "",
         description: "",
@@ -130,7 +131,7 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"
-            placeholder="Your name (optional)"
+            placeholder="Type Your name "
             className="p-3 text-sm border rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
             value={form.submitterName}
             onChange={(e) =>

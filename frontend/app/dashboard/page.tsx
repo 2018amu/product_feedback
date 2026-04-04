@@ -11,7 +11,12 @@ export default function Dashboard() {
   const [sort, setSort] = useState("createdAt");
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
-
+  
+  /**
+ * Retrieves the authentication token from localStorage.
+ * Ensures the code runs only in the browser by checking for `window`,
+ * preventing errors during server-side rendering (SSR) in frameworks like Next.js.
+ */
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
 
   const fetchData = async () => {
