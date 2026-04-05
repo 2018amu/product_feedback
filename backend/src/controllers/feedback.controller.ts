@@ -7,10 +7,12 @@ export const createFeedback = async (req: Request, res: Response) => {
     const { title, description, category, submitterName, submitterEmail } =
       req.body;
 
-    //  Get client IP
+    // ✅ Get client IP
     const ip = req.ip;
 
-    //  Rate limiting (5 per hour per IP)
+    console.log("Client IP:", ip);
+
+    // ✅ Rate limiting (5 per hour per IP)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     const count = await Feedback.countDocuments({
@@ -25,7 +27,7 @@ export const createFeedback = async (req: Request, res: Response) => {
       });
     }
 
-    // Validation
+    // ✅ Validation
     if (!title || !description || !category) {
       return res.status(400).json({
         success: false,
@@ -40,24 +42,28 @@ export const createFeedback = async (req: Request, res: Response) => {
       });
     }
 
-    //  Save feedback FIRST (with IP)
+    // ✅ Save feedback FIRST
     const feedback = await Feedback.create({
       title,
       description,
       category,
       submitterName,
       submitterEmail,
-      ip, //  store IP
+      ip,
     });
 
-console.log("STEP 1: Before AI call");
+    console.log("STEP 1: Feedback saved");
 
-const aiResult = await analyzeFeedback(title, description);
+    // ✅ Call AI
+    const aiResult = await analyzeFeedback(title, description);
 
-console.log("STEP 2: After AI call");
-console.log("AI RESULT:", aiResult);
-    // 3️ If AI success → update DB
-    if (aiResult) {
+    console.log("STEP 2: After AI call");
+    console.log("AI RESULT:", aiResult);
+
+    // ✅ Handle AI failure explicitly
+    if (!aiResult) {
+      console.warn("AI analysis failed");
+    } else {
       feedback.ai_category = aiResult.category;
       feedback.ai_sentiment = aiResult.sentiment;
       feedback.ai_priority = aiResult.priority_score;
@@ -66,14 +72,19 @@ console.log("AI RESULT:", aiResult);
       feedback.ai_processed = true;
 
       await feedback.save();
+
+      console.log("STEP 3: AI data saved to DB");
     }
 
-return res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: feedback,
       message: "Feedback submitted with AI analysis",
     });
-  } catch (error) {
+
+  } catch (error: any) {
+    console.error("CREATE FEEDBACK ERROR:", error.message || error);
+
     return res.status(500).json({
       success: false,
       message: "Server error",
