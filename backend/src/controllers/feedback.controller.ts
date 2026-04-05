@@ -40,7 +40,7 @@ export const createFeedback = async (req: Request, res: Response) => {
       });
     }
 
-    // 1️ Save feedback FIRST (with IP)
+    //  Save feedback FIRST (with IP)
     const feedback = await Feedback.create({
       title,
       description,
@@ -50,9 +50,12 @@ export const createFeedback = async (req: Request, res: Response) => {
       ip, //  store IP
     });
 
-    // 2️ Call Gemini (async)
-    const aiResult = await analyzeFeedback(title, description);
+console.log("STEP 1: Before AI call");
 
+const aiResult = await analyzeFeedback(title, description);
+
+console.log("STEP 2: After AI call");
+console.log("AI RESULT:", aiResult);
     // 3️ If AI success → update DB
     if (aiResult) {
       feedback.ai_category = aiResult.category;
@@ -65,7 +68,7 @@ export const createFeedback = async (req: Request, res: Response) => {
       await feedback.save();
     }
 
-    return res.status(201).json({
+return res.status(201).json({
       success: true,
       data: feedback,
       message: "Feedback submitted with AI analysis",
