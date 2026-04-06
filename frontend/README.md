@@ -104,14 +104,11 @@ Backend: http://localhost:4000
 
 ---
 
-## 🔐 Admin Login
 
-Email: [admin@feedpulse.com](mailto:admin@feedpulse.com)
-Password: 123456
 
 ---
 
-## 📸 Screenshots
+##  Screenshots
 
 (Add screenshots here — VERY IMPORTANT for submission)
 

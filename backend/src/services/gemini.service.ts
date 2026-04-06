@@ -10,7 +10,7 @@ export const analyzeFeedback = async (title: string, description: string) => {
       throw new Error("Missing Gemini API key");
     }
 
-    // ✅ Initialize here (AFTER env is available)
+  
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const model = genAI.getGenerativeModel({
@@ -39,7 +39,7 @@ Required JSON format:
 
     console.log("Gemini Raw Response:", response);
 
-    // Clean JSON
+    //  JSON
     const cleaned = response.replace(/```json|```/g, "").trim();
 
     const parsed = JSON.parse(cleaned);

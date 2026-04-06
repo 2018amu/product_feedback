@@ -10,7 +10,7 @@ export interface IFeedback extends Document {
   submitterName?: string;
   submitterEmail?: string;
 
-  ip?: string; //  ADD THIS
+  ip?: string; 
 
   ai_category?: string;
   ai_sentiment?: "Positive" | "Neutral" | "Negative";

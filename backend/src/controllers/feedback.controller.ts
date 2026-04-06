@@ -7,12 +7,12 @@ export const createFeedback = async (req: Request, res: Response) => {
     const { title, description, category, submitterName, submitterEmail } =
       req.body;
 
-    // ✅ Get client IP
+    //  Get client IP
     const ip = req.ip;
 
     console.log("Client IP:", ip);
 
-    // ✅ Rate limiting (5 per hour per IP)
+    //  Rate limiting (5 per hour per IP)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     const count = await Feedback.countDocuments({
@@ -27,7 +27,7 @@ export const createFeedback = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Validation
+    //  Validation
     if (!title || !description || !category) {
       return res.status(400).json({
         success: false,
@@ -42,7 +42,7 @@ export const createFeedback = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Save feedback FIRST
+    //  Save feedback FIRST
     const feedback = await Feedback.create({
       title,
       description,
@@ -54,13 +54,13 @@ export const createFeedback = async (req: Request, res: Response) => {
 
     console.log("STEP 1: Feedback saved");
 
-    // ✅ Call AI
+    //  Call AI
     const aiResult = await analyzeFeedback(title, description);
 
     console.log("STEP 2: After AI call");
     console.log("AI RESULT:", aiResult);
 
-    // ✅ Handle AI failure explicitly
+    //  Handle AI failure explicitly
     if (!aiResult) {
       console.warn("AI analysis failed");
     } else {

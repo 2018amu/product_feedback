@@ -74,7 +74,7 @@ export default function Dashboard() {
         Dashboard
       </h1>
       <div className="text-sm text-gray-500">
-        Welcome Admin 👋
+        Welcome Admin 
       </div>
     </div>
 
@@ -139,7 +139,7 @@ export default function Dashboard() {
         </select>
       </div>
 
-      {/* FEEDBACK TABLE STYLE */}
+      {/* FEEDBACK TABLE  */}
       <div className="bg-white rounded-xl border overflow-hidden">
 
         <div className="grid grid-cols-6 bg-gray-50 text-xs font-medium text-gray-500 px-4 py-3">
